@@ -76,8 +76,8 @@ services:
        - --log.level=info
        - --store=bolt
        - --bolt.path=/data/bot.db
-       - --telegram.admin=1767793443
-       - --telegram.token=5255213852:AAGsPkJAyLm9pTtKsAEzmNhkFSk6AimXtKk
+       - --telegram.admin=1767793443                                      # id telegramm acount
+       - --telegram.token=5255213852:AAGsPkJAyLm9pTtKsAEzmNhkFSk6AimXtKk  # token telegramm bot
      image: metalmatze/alertmanager-bot:0.4.3
      user: root
      ports:
@@ -160,7 +160,7 @@ EOF
 cat <<EOF> prometheus/configuration/alert.rules
 
 groups: 
-- name: test
+- name: HOUSE
   rules:
   - alert: Exporter-disable
     expr: up == 0
