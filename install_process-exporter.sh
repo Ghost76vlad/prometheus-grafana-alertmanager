@@ -1,0 +1,40 @@
+#!/bin/bash
+
+wget https://github.com/ncabatoff/process-exporter/releases/download/v0.8.5/process-exporter-0.8.5.linux-amd64.tar.gz
+tar -xvf process-exporter-0.8.5.linux-amd64.tar.gz
+cp process-exporter-0.8.5.linux-amd64/process-exporter /usr/local/bin/
+rm -rf process-exporter-0.8.5.linux-amd64*
+chown -R nodeusr:nodeusr /usr/local/bin/process-exporter
+mkdir /etc/process_exporter/
+
+cat <<EOF> /etc/process_exporter/process-exporter.yml
+
+process_names:
+  - name: "{{.Comm}}"
+    cmdline:
+    - '.+'
+
+EOF
+
+cat <<EOF> /etc/systemd/system/process_exporter.service
+
+[Unit]
+Description=Prometheus Process Exporter
+After=network.target
+
+[Service]
+Type=simple
+User=nodeusr
+Group=nodeusr
+ExecStart=/usr/local/bin/process-exporter \
+          --config.path /etc/process_exporter/process-exporter.yml \
+          --web.listen-address=:9256
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
+EOF
+
+systemctl enable process_exporter.service --now
